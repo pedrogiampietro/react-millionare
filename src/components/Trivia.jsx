@@ -1,11 +1,6 @@
 import React from 'react';
 
-export function Trivia({
-  data,
-  setTimeOut,
-  questionNumber,
-  setQuestionNumber,
-}) {
+export function Trivia({ data, setStop, questionNumber, setQuestionNumber }) {
   const [question, setQuestion] = React.useState(null);
   const [selectedAnswer, setSelectedAnswer] = React.useState(null);
   const [className, setClassName] = React.useState('answer');
@@ -14,12 +9,26 @@ export function Trivia({
     setQuestion(data[questionNumber - 1]);
   }, [data, questionNumber]);
 
+  function delay(duration, callback) {
+    setTimeout(() => {
+      callback();
+    }, duration);
+  }
+
   function handleClick(value) {
     setSelectedAnswer(value);
     setClassName('answer active');
-    setTimeout(() => {
-      setClassName(value.correct ? 'answer correct' : 'answer wrong');
-    }, 3000);
+    delay(3000, () =>
+      setClassName(value.correct ? 'answer correct' : 'answer wrong')
+    );
+    delay(6000, () => {
+      if (value.correct) {
+        setQuestionNumber(prev => prev + 1);
+        setSelectedAnswer(null);
+      } else {
+        setStop(true);
+      }
+    });
   }
 
   return (
