@@ -2,10 +2,12 @@ import React from 'react';
 
 import './assets/app.css';
 import { Trivia } from './components/Trivia';
+import { Timer } from './components/Timer';
 
 export function App() {
   const [questionNumber, setQuestionNumber] = React.useState(1);
   const [stop, setStop] = React.useState(false);
+  const [earned, setEarned] = React.useState('$ 0');
 
   const data = [
     {
@@ -76,34 +78,51 @@ export function App() {
     },
   ];
 
-  const moneyPyramid = [
-    { id: 1, amount: 'R$ 100' },
-    { id: 2, amount: 'R$ 200' },
-    { id: 3, amount: 'R$ 300' },
-    { id: 4, amount: 'R$ 400' },
-    { id: 5, amount: 'R$ 500' },
-    { id: 6, amount: 'R$ 600' },
-    { id: 7, amount: 'R$ 700' },
-    { id: 8, amount: 'R$ 800' },
-    { id: 9, amount: 'R$ 900' },
-    { id: 10, amount: 'R$ 1000' },
-    { id: 11, amount: 'R$ 100000' },
-  ].reverse();
+  const moneyPyramid = React.useMemo(
+    () =>
+      [
+        { id: 1, amount: 'R$ 100' },
+        { id: 2, amount: 'R$ 200' },
+        { id: 3, amount: 'R$ 300' },
+        { id: 4, amount: 'R$ 400' },
+        { id: 5, amount: 'R$ 500' },
+        { id: 6, amount: 'R$ 600' },
+        { id: 7, amount: 'R$ 700' },
+        { id: 8, amount: 'R$ 800' },
+        { id: 9, amount: 'R$ 900' },
+        { id: 10, amount: 'R$ 1000' },
+        { id: 11, amount: 'R$ 100000' },
+      ].reverse(),
+    []
+  );
+
+  React.useEffect(() => {
+    questionNumber > 1 &&
+      setEarned(moneyPyramid.find(m => m.id === questionNumber - 1).amount);
+  }, [moneyPyramid, questionNumber]);
 
   return (
     <div className="app">
       <div className="main">
-        <div className="top">
-          <div className="timer">30</div>
-        </div>
-        <div className="bottom">
-          <Trivia
-            data={data}
-            setStop={setStop}
-            questionNumber={questionNumber}
-            setQuestionNumber={setQuestionNumber}
-          />
-        </div>
+        {stop ? (
+          <h1 className="endText">You earned: {earned}</h1>
+        ) : (
+          <>
+            <div className="top">
+              <div className="timer">
+                <Timer setStop={setStop} questionNumber={questionNumber} />
+              </div>
+            </div>
+            <div className="bottom">
+              <Trivia
+                data={data}
+                setStop={setStop}
+                questionNumber={questionNumber}
+                setQuestionNumber={setQuestionNumber}
+              />
+            </div>
+          </>
+        )}
       </div>
       <div className="pyramid">
         <ul className="moneyList">
